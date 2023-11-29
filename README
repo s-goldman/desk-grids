@@ -1,3 +1,12 @@
+All the important files have my initials "srg" in the name. 
+
+To run:
+    compile dusty, e.g.:    gfortran dustyV2.f -std=legacy -o dusty
+    run the code:           python srg_dusty_grid.py
+
+Another example of json file is example_silicate_mix_srg_dust_grid.json
+which was used for the silicate-mix grid.
+
 Input parameters (in srg_dust_grid.json)
 ----------------------------------------------------
 grid_name               (str)               name of your grid
