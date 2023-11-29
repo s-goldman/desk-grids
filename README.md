@@ -1,3 +1,4 @@
+## srg_dust_grid.json parameters
 grid_name               (str)               name of your grid
 test                    (bool)              if true, code will run in test mode
 remove_previous         (bool)              if true, code will delete files from previous run
@@ -18,11 +19,9 @@ The fraction for the third grain type is the remainder of the total
 grain fraction after the first three grain types have been accounted for, 
 so long as the total is 100% or less.
 
-DUSTY instructions for changing wavelength sampling:
-
+### DUSTY instructions for changing wavelength sampling:
 Change lambda_grid.dat to change wavelength sampling
 Change userpar.inc
 Recompile with gfortran dustyV2.f -std=legacy -o dusty
-
 run srg_dusty_grid.py
 
