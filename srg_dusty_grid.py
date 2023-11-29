@@ -15,7 +15,7 @@ from tqdm import tqdm
 import numpy as np
 from glob import glob
 from multiprocessing import cpu_count
-from astropy.table import Table, Column, vstack, hstack
+from astropy.table import Table, Column, vstack, hstack, unique
 
 
 def remove_previous_run(grid_name):
@@ -164,6 +164,15 @@ def set_up_input_files(
 
 
 def batch_dusty(config):
+    """Runs available {grid_name}_*.inp files with dusty in parallel using 
+    inputs from config (srg_dusty_grid.json)
+
+    Parameters
+    ----------
+    config : dict
+        dictionary of parameters from srg_dust_grid.json file.
+
+    """
     file_names = glob(config["grid_name"] + "_*.inp")
 
     def print_time():
@@ -184,22 +193,20 @@ def batch_dusty(config):
         n_cores = cpu_count() - 1
     print(f"\nUsing a maximum of {n_cores} cores")
     start = time.time()
-    nn = 0
-    left_to_do = 0
 
     # get files
     file_names_without_extension = [x.replace(".inp", "") for x in file_names]
 
     # get input filenames
     if len(file_names_without_extension) == 0:
-        raise Exception("No files : (")
+        raise Exception("No input files : (")
     elif len(file_names_without_extension) < 1:
         run_file_list = file_names_without_extension[0]
     else:
         run_file_list = file_names_without_extension
 
     for source_index, source in enumerate(run_file_list):
-        # adds source to dusty.inp
+        # adds source to dusty.inp (input file for individual dusty runs)
         with open("dusty.inp", "w") as f:
             f.write(str(source) + "\n")
             f.close()
@@ -237,7 +244,7 @@ def batch_dusty(config):
                         process.communicate()
                         del starts[n_process]
                         del running[n_process]
-                time.sleep(30)  # checks if process finished every 5 seconds
+                time.sleep(30)  # checks if process finished every N seconds
 
             # gets and prints time left
             if len(times) > 0:
@@ -481,8 +488,7 @@ def run_dusty():
     set_up_input_files(config)
 
     # run dusty
-    batch_dusty(config)
-    time.sleep(5)
+    batch_dusty(config); time.sleep(5)
 
     # collate results
     dusty_to_grid(config)
