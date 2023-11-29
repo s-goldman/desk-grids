@@ -1,16 +1,7 @@
-# Steven Goldman 11/28/24 sgoldman@stsci.edu
-# 3-Clause BSD License; Copyright (c) 2019, Steven R. Goldman; All rights reserved.
-
-# NOTES
 # recompiling: gfortran dustyV2.f -std=legacy -o dusty
+# make executable: chmod +x dusty
 # command for running on science cluster: nohup nice -19 python srg_dusty_grid.py > log.txt &
 # if only getting .inp files recompile in fortran
-
-# to do:
-# better user interface, with checks on inputs
-# add to github
-# add tests
-# add method to add grids to desk directory for use
 
 import os
 import json
@@ -28,6 +19,13 @@ from astropy.table import Table, Column, vstack, hstack
 
 
 def remove_previous_run(grid_name):
+    """removes previous run of dusty grid if grid_name in the file name
+
+    Parameters
+    ----------
+    grid_name : str
+        str associated with previous run to remove
+    """
     if os.path.exists(grid_name) and os.path.isdir(grid_name):
         shutil.rmtree(grid_name)
     for item in glob(grid_name + "*"):
@@ -38,6 +36,15 @@ def remove_previous_run(grid_name):
 def set_up_input_files(
     config,
 ):
+    """Creates input files for running dusty using srg_dust_grid.json
+    file and setting it as the dictionary "config".
+
+    Parameters
+    ----------
+    config : dict
+        dictionary of parameters from srg_dust_grid.json file.
+    """
+    # Alters the inputs for testing the code in test mode.
     if config["test"] == True:
         config["grid_name"] = "test-mix"
         config["effective_temp_grid"] = [2600]
@@ -48,6 +55,7 @@ def set_up_input_files(
         config["tau_number"] = 2
         config["tau_max"] = 0.01
 
+    # Sets column names for dust fraction columns
     grain_a_filename = config["grain_a_filename"] + "_frac"
     grain_b_filename = config["grain_b_filename"] + "_frac"
     grain_c_filename = config["grain_c_filename"] + "_frac"
@@ -56,6 +64,7 @@ def set_up_input_files(
     all_files = []
     counter = 0
 
+    # Columns to be used for matrix generation
     independent_vars = [
         config["effective_temp_grid"],
         config["inner_dust_temp_grid"],
@@ -64,6 +73,7 @@ def set_up_input_files(
         config["grain_type_d_grid"],
     ]
 
+    # Input table matrix creation
     param_array = Table(
         np.array(list(itertools.product(*independent_vars))),
         names=(
@@ -401,7 +411,6 @@ def dusty_to_grid(config):
         set_outputs_large = Table(np.repeat(set_outputs, len(subset_spectra)))
 
         # resulting outputs
-        # print(grid_idx_filename + "\n")
         subset_single_output_file = read_output_file(grid_idx_filename)
         subset_outputs = hstack((set_outputs_large, subset_single_output_file))
 
@@ -420,22 +429,30 @@ def dusty_to_grid(config):
             full_outputs = vstack((full_outputs, subset_outputs))
 
         # #### TESTS
-        # # make sure spectra and outputs numbers match
-        # assert np.all(np.array(subset_outputs["number"]) == np.array(valid_numbers)), (
-        #     "Misaligned models and outputs: "
-        #     + str(list(valid_numbers))
-        #     + " vs. "
-        #     + str(list(subset_outputs["number"]))
-        # )
+        # make sure spectra and outputs numbers match
+        assert np.all(np.array(subset_outputs["number"]) == np.array(valid_numbers)), (
+            "Misaligned models and outputs: "
+            + str(list(valid_numbers))
+            + " vs. "
+            + str(list(subset_outputs["number"]))
+        )
 
-        # # makes sure spectra and outputs are the same size
-        # assert len(full_outputs) == len(
-        #     full_spectra
-        # ), "Size of spectra and outputs are different"
+        # makes sure spectra and outputs are the same size
+        assert len(full_outputs) == len(
+            full_spectra
+        ), "Size of spectra and outputs are different"
 
-        # assert len(full_outputs) == len(
-        #     unique(full_outputs)
-        # ), "Duplicated rows in outputs"
+        # make sure rows are unique
+        assert len(full_outputs) == len(
+            unique(full_outputs)
+        ), "Duplicated rows in outputs"
+
+    if len(full_outputs) > 0 and len(full_spectra) > 0:
+        print(f"Total number of models: {len(full_outputs)}")
+    else:
+        raise Exception(
+            "No models found. Check your input files, or recompile dusty:\n\t gfortran dustyV2.f -std=legacy -o dusty"
+        )
 
     if np.all(full_outputs[config["grain_b_filename"] + "_frac"] == 0):
         full_outputs.remove_column(config["grain_b_filename"] + "_frac")

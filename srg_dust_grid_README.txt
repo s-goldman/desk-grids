@@ -13,3 +13,14 @@ grain_type_b_grid       (array)             " second grain type
 grain_type_d_grid       (array)             " fourth grain type, where the fraction for the third is the remainder
 tau_number              (int)               number of individual optical depths to consider
 tau_max                 (float)             maximum optical depth at 10um for models
+
+
+
+DUSTY instructions for changing wavelength sampling
+
+Change lambda_grid.dat to change wavelength sampling
+Change userpar.inc
+Recompile with gfortran dustyV2.f -std=legacy -o dusty
+
+run srg_dusty_grid
+
