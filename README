@@ -1,8 +1,8 @@
 grid_name               (str)               name of your grid
 test                    (bool)              if true, code will run in test mode
-remove_previous         (bool)              if true, code will delete files associates with previous runs
-n_cores                 (null or int)       number of cores to use for the run, uses all but one if set as null
-grain_a_filename        (str)               name of the dust optical constant file for first grain type
+remove_previous         (bool)              if true, code will delete files from previous run
+n_cores                 (null or int)       number of cores to use, uses all but one if null
+grain_a_filename        (str)               dust optical constant file for first grain type
 grain_b_filename        (str)               " second grain type
 grain_c_filename        (str)               " third grain type
 grain_d_filename        (str)               " fourth grain type
