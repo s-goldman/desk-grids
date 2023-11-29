@@ -17,9 +17,9 @@ grain_c_filename        (str)               " third grain type
 grain_d_filename        (str)               " fourth grain type
 effective_temp_grid     (array)             effective temperature(s) of BB used for model
 inner_dust_temp_grid    (array)             inner dust temperature(s) of model
-grain_type_a_grid       (array)             grain fraction (totalling 100%) for first grain type   
-grain_type_b_grid       (array)             " second grain type
-grain_type_d_grid       (array)             " fourth grain type
+grain_type_a_grid       (array)             grain fraction(s) (totalling 100%) for first grain type   
+grain_type_b_grid       (array)             " second grain fraction(s), can be [0] to ignore
+grain_type_d_grid       (array)             " fourth grain fraction(s), can be [0] to ignore
 tau_number              (int)               number of individual optical depths to consider
 tau_max                 (float)             maximum optical depth at 10um for models
 
