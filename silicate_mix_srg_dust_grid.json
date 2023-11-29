@@ -1,0 +1,17 @@
+{
+    "grid_name": "test-mix", 
+    "test": false, 
+    "remove_previous": true, 
+    "n_cores": null, 
+    "grain_a_filename": "OssOrich", 
+    "grain_b_filename": "OssOdef", 
+    "grain_c_filename": "crSil", 
+    "grain_d_filename": "FeO", 
+    "effective_temp_grid": [2600, 2800, 3000, 3200, 3400], 
+    "inner_dust_temp_grid": [600, 700, 800, 900, 1000, 1100, 1200], 
+    "grain_type_a_grid": [0, 16, 24, 38, 42, 56, 64, 80], 
+    "grain_type_b_grid": [0, 16, 24, 38, 42, 56, 64, 80], 
+    "grain_type_d_grid": [4], 
+    "tau_number": 50, 
+    "tau_max": 30
+} 

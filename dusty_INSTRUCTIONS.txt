@@ -1,0 +1,8 @@
+DUSTY instructions
+
+Change lambda_grid.dat to change wavelength sampling
+Change userpar.inc
+Recompile with gfortran dustyV2.f -std=legacy -o dusty
+
+run srg_dusty_grid
+
