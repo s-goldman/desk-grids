@@ -488,7 +488,7 @@ def run_dusty():
     set_up_input_files(config)
 
     # run dusty
-    batch_dusty(config); time.sleep(5)
+    batch_dusty(config); time.sleep(300)
 
     # collate results
     dusty_to_grid(config)
