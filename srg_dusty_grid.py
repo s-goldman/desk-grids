@@ -54,6 +54,8 @@ def set_up_input_files(
         config["grain_type_d_grid"] = [0]
         config["tau_number"] = 2
         config["tau_max"] = 0.01
+        config["use_atmospheric_model"] = False
+        config["atmospheric_model_chemistry"] = "oxygen"
 
     # Sets column names for dust fraction columns
     grain_a_filename = config["grain_a_filename"] + "_frac"
@@ -100,19 +102,29 @@ def set_up_input_files(
 
     # remove rows where third dust component fraction is less than zero
     param_array = param_array[param_array[grain_c_filename] >= 0]
+    
+    if config["use_atmospheric_model"] == True:
+        print('\nUsing (CO)MARCS atmospheric models') 
+        if config["atmospheric_model_chemistry"] == 'carbon':
+            atmospheric_end_string = '.dat'
+            filename_atm_suffix = 'atmo_C'
+        elif config["atmospheric_model_chemistry"] == 'oxygen':
+            atmospheric_end_string = '.dusty'
+            filename_atm_suffix = 'atmo_O'
+        else:
+            raise Exception(f"atmospheric_model_chemistry value: '{config['atmospheric_model_chemistry']}' not recognized. Options are 'carbon' or 'oxygen'")
 
+    else:
+        print('\nUsing BB for source')
+        filename_atm_suffix = 'BB'
+    
     for item in param_array:
-        # if item["teff"] == 3400:
-        #     teff_w_g = str(item["teff"]) + "_g-"
-        #     z = "0.25"
-        # else:
-        #     teff_w_g = str(item["teff"]) + "_g+"
-        #     z = "0.00"
-
         filename = (
             str(item["grid_name"])
             + "_"
             + str(item["teff"])
+            + "_"
+            + filename_atm_suffix
             + "_"
             + str(item["tinner"])
             + "_"
@@ -136,14 +148,18 @@ def set_up_input_files(
             + "-"
             + str(item["grid_idx"])
         )
+        
+        if config["use_atmospheric_model"] == False:
+            external_radiation_line = f"Spectrum = 1\n\t\tNumber of BB = 1\n\t\tTemperature = {item['teff']} K"
+        elif config["use_atmospheric_model"] == True:
+            model_string = glob(f"comarcs_spectra/*{item['teff']}*{atmospheric_end_string}")[0]
+            external_radiation_line = f"Spectrum = 6\n\t\t{model_string}"
 
         all_files.append(filename)
         open(filename + ".inp", "w").write(
             open("template_dusty.inp", "r")
             .read()
             .format(
-                # teff=teff_w_g, # change for aringer (currently not working)
-                teff=item["teff"],
                 tinner=item["tinner"],
                 grain_a_nk_filename=config["grain_a_filename"] + ".nk",
                 grain_b_nk_filename=config["grain_b_filename"] + ".nk",
@@ -153,9 +169,9 @@ def set_up_input_files(
                 b=item[grain_b_filename],
                 c=item[grain_c_filename],
                 d=item[grain_d_filename],
-                # z_val=z,
                 tau_number=config["tau_number"],
                 tau_max=config["tau_max"],
+                external_radiation_line=external_radiation_line,
             )
         )
         counter += 1
@@ -191,7 +207,7 @@ def batch_dusty(config):
         n_cores = config["n_cores"]
     else:
         n_cores = cpu_count() - 1
-    print(f"\nUsing a maximum of {n_cores} cores")
+    print(f"Using a maximum of {n_cores} cores")
     start = time.time()
 
     # get files
@@ -488,7 +504,7 @@ def run_dusty():
     set_up_input_files(config)
 
     # run dusty
-    batch_dusty(config); time.sleep(5)
+    batch_dusty(config); time.sleep(300)
 
     # collate results
     dusty_to_grid(config)

@@ -30,9 +30,7 @@
 
   I PHYSICAL PARAMETERS
      1) External radiation:
-        Spectrum = 1
-        Number of BB = 1
-        Temperature = {teff} K
+      {external_radiation_line}
 
      2) Dust Properties
 
