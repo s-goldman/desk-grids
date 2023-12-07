@@ -402,6 +402,9 @@ def dusty_to_grid(config):
     output_files_sorted = np.array(output_files)[np.argsort(output_files_ind)]
 
     grid_idx_array = Table.read(config["grid_name"] + "_grid_idx.csv")
+    print(f'Number of models to retreive: {len(output_files_sorted)}')
+    
+    full_outputs = Table()
 
     for j, grid_idx_filename in tqdm(enumerate(output_files_sorted)):
         grid_idx = grid_idx_filename.split("grid-")[-1][:-4]
